@@ -1,4 +1,2 @@
-live/uat/pubsub/.terraform/terraform.tfstate
-live/uat/pubsub/.terraform/modules/modules.json
-live/uat/bucket_backend_store/terraform.tfstate
-live/uat/cloudfunction/order_webhook_cf/.terraform.lock.hcl
+terraform.tfstate
+.terraform*

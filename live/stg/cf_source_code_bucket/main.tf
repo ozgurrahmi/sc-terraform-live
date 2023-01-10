@@ -1,5 +1,5 @@
 locals {
-  bucket_name = "test-terraform-backend-store-uat"
+  bucket_name = format("test-cloudfunction-sources-%s", module.shared.env_name)
 }
 
 terraform {
@@ -8,6 +8,12 @@ terraform {
       source  = "hashicorp/google"
       version = "3.5.0"
     }
+  }
+
+  // variables are not allowed in bucket and prefix!!  
+  backend "gcs" {
+    bucket = "test-terraform-backend-store-stg"
+    prefix = "cloudfunction/cf_source_code_bucket"
   }
 }
 
@@ -25,4 +31,5 @@ module "bucket" {
   source      = "git@github.com:ozgurrahmi/sc-terraform-common-modules.git//modules/bucket"
   bucket_name = local.bucket_name
   location    = module.shared.region
+  project_id  = module.shared.project
 }

@@ -1,5 +1,5 @@
 locals {
-  topic_name = "test-order-webhook-topic"
+  bucket_name = format("test-cloudfunction-sources-%s", module.shared.env_name)
 }
 
 terraform {
@@ -13,7 +13,7 @@ terraform {
   // variables are not allowed in bucket and prefix!!  
   backend "gcs" {
     bucket = "test-terraform-backend-store-uat"
-    prefix = "pubsub/order_webhook_topic"
+    prefix = "cloudfunction/cf_source_code_bucket"
   }
 }
 
@@ -24,12 +24,12 @@ provider "google" {
 
 // passing common constants (project,region,env_name) 
 module "shared" {
-  source = "../../shared"
+  source = "../shared"
 }
 
-module "pubsub" {
-  source     = "git@github.com:ozgurrahmi/sc-terraform-common-modules.git//modules/pubsub"
-  project_id = module.shared.project
-  env_name   = module.shared.env_name
-  topic_name = local.topic_name
+module "bucket" {
+  source      = "git@github.com:ozgurrahmi/sc-terraform-common-modules.git//modules/bucket"
+  bucket_name = local.bucket_name
+  location    = module.shared.region
+  project_id  = module.shared.project
 }

@@ -1,9 +1,9 @@
 locals {
-  bucket_name = format("test-cloudfunction-%s", module.shared.env_name)
-  name        = "order-webhook"
-  topic_name  = "test-order-webhook-topic"
+  name        = "test-product-webhook"
+  topic_name  = "test-product-webhook-topic"
   runtime     = "go116"
   entry_point = "HelloPubSub"
+  source_path = "../../../sources/product-webhook-cf-uat.zip"
 }
 
 terraform {
@@ -17,7 +17,7 @@ terraform {
   // variables are not allowed in bucket and prefix!!  
   backend "gcs" {
     bucket = "test-terraform-backend-store-uat"
-    prefix = "cloudfunction/order_webhook_cf"
+    prefix = "cloudfunction/test_product_webhook_cf"
   }
 }
 
@@ -38,16 +38,24 @@ module "pubsub" {
   topic_name = local.topic_name
 }
 
+data "terraform_remote_state" "cloud_function_source_bucket" {
+  backend = "gcs"
+  config = {
+    bucket = "test-terraform-backend-store-uat"
+    prefix = "cloudfunction/cf_source_code_bucket"
+  }
+}
+
 module "cloudfunction" {
   source      = "git@github.com:ozgurrahmi/sc-terraform-common-modules.git//modules/cloudfunction"
   project_id  = module.shared.project
   region_id   = module.shared.region
   env_name    = module.shared.env_name
-  bucket_name = local.bucket_name
+  bucket_name = data.terraform_remote_state.cloud_function_source_bucket.outputs.bucket_name
   name        = local.name
   runtime     = local.runtime
   entry_point = local.entry_point
-  source_path = "git@github.com:ozgurrahmi/sc-terraform-common-modules.git//modules/cloudfunction"
+  source_path = local.source_path
   // module dependency 
   topic_name = module.pubsub.topic_name
 }
