@@ -3,7 +3,7 @@ locals {
   topic_name  = "test-order-webhook-topic"
   runtime     = "go116"
   entry_point = "HelloPubSub"
-  source_path = "../../../sources/order-webhook-cf-uat.zip"
+  source_path = ".../../cf_source_codes/order-webhook-cf-uat.zip"
 }
 
 terraform {
