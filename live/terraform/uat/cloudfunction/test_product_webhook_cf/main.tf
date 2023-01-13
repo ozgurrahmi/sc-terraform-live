@@ -1,9 +1,10 @@
 locals {
-  name        = "test-order-webhook"
-  topic_name  = "test-order-webhook-topic"
+  name        = "test-product-webhook"
+  topic_name  = "test-product-webhook-topic"
   runtime     = "go116"
   entry_point = "HelloPubSub"
-  source_path = ".../../cf_source_codes/order-webhook-cf-uat.zip"
+  source_path = "../../cf_source_codes/product-webhook-cf-uat.zip"
+  flag        = var.flag
 }
 
 terraform {
@@ -17,7 +18,7 @@ terraform {
   // variables are not allowed in bucket and prefix!!  
   backend "gcs" {
     bucket = "test-terraform-backend-store-uat"
-    prefix = "cloudfunction/test_order_webhook_cf"
+    prefix = "cloudfunction/test_product_webhook_cf"
   }
 }
 
@@ -37,6 +38,7 @@ module "pubsub" {
   env_name   = module.shared.env_name
   topic_name = local.topic_name
 }
+
 
 data "terraform_remote_state" "cloud_function_source_bucket" {
   backend = "gcs"
