@@ -1,6 +1,5 @@
 locals {
   name        = "test-product-webhook"
-  topic_name  = "test-product-webhook-topic"
   runtime     = "go116"
   entry_point = "HelloPubSub"
   source_path = "../../cf_source_codes/product-webhook-cf-stg.zip"
@@ -31,11 +30,13 @@ module "shared" {
   source = "../../shared"
 }
 
-module "pubsub" {
-  source     = "git@github.com:ozgurrahmi/sc-terraform-common-modules.git//modules/pubsub?ref=v3.0"
-  project_id = module.shared.project
-  env_name   = module.shared.env_name
-  topic_name = local.topic_name
+
+data "terraform_remote_state" "test_order_webhook_topic" {
+  backend = "gcs"
+  config = {
+    bucket = "test-terraform-backend-store-stg"
+    prefix = "pubsub/test_product_webhook_topic"
+  }
 }
 
 data "terraform_remote_state" "cloud_function_source_bucket" {
@@ -57,5 +58,5 @@ module "cloudfunction" {
   entry_point = local.entry_point
   source_path = local.source_path
   // module dependency 
-  topic_name = module.pubsub.topic_name
+  topic_name = data.terraform_remote_state.test_order_webhook_topic.outputs.topic_name
 }

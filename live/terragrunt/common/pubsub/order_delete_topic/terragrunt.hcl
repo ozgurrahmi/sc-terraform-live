@@ -5,12 +5,6 @@ locals {
   env_name = get_env("ENV", local.env_vars.locals.env_name)
 }
 
-/*
-
-project_id = module.shared.project
-  env_name   = module.shared.env_name
-  topic_name = local.topic_name*/
-
 inputs = {
   topic_name = "order-delete-topic-${local.env_name}"
   env_name    = local.env_name
